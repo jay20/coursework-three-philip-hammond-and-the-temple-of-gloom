@@ -2,6 +2,12 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
+import game.NodeStatus;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Stack;
 
 public class Explorer {
 
@@ -36,6 +42,20 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
+      Stack<Long> pathExplored = new Stack<>();
+      List<Long> possibleNode = new ArrayList<>();
+      List<Long> lastNode = new ArrayList<>();
+
+      pathExplored.add(state.getCurrentLocation());
+      List<Long> nodeNeighbors = state.getNeighbours();
+
+      System.out.println(pathExplored);
+
+
+      while (state.getDistanceToTarget() != 0){
+          System.out.println(nodeNeighbors);
+      }
+
 
 /* Notes on how to explore the maze :
 

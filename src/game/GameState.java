@@ -234,7 +234,7 @@ public class GameState implements ExplorationState, EscapeState {
      * and the distance from that node to the target.
      */
     @Override
-    public Collection<NodeStatus> getNeighbours() {
+    public List<Long> getNeighbours() {
         if (stage != Stage.EXPLORE) {
             throw new IllegalStateException("getNeighbours() can only be called while exploring!");
         }
