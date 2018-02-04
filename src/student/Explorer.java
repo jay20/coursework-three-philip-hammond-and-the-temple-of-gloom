@@ -47,7 +47,7 @@ public class Explorer {
       List<Long> lastNode = new ArrayList<>();
 
       pathExplored.add(state.getCurrentLocation());
-      List<Long> nodeNeighbors = state.getNeighbours();
+      Collection<NodeStatus> nodeNeighbors = state.getNeighbours();
 
       System.out.println(pathExplored);
 

@@ -1,6 +1,6 @@
 package game;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * The state of the game while performing exploration.
@@ -25,7 +25,7 @@ public interface ExplorationState {
      * of rows and columns away from the target.)
      * It is possible to move directly to any node identifier in this collection.
      */
-    List<Long> getNeighbours();
+    Collection<NodeStatus> getNeighbours();
 
     /**
      * Return your current distance along the grid (NOT THE GRAPH) from the target.
