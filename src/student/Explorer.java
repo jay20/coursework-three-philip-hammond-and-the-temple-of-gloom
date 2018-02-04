@@ -21,9 +21,9 @@ public class Explorer {
    * (ignoring walls and obstacles).
    * <p>
    * To get information about the current state, use functions
-   * getCurrentLocation(),
-   * getNeighbours(), and
-   * getDistanceToTarget()
+   * getCurrentLocation() long returning distance from explorer's current location to the Orb
+   * getNeighbours() returns collection of Node Status Objects containing neighbor ID & distance from Orb
+   * getDistanceToTarget() distance from explore's location to the Orb
    * in ExplorationState.
    * You know you are standing on the orb when getDistanceToTarget() is 0.
    * <p>
@@ -36,7 +36,37 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-    //TODO:
+
+/* Notes on how to explore the maze:
+
+while getDistanceToTarget != 0
+moveTo(long id) of the optimal neighboring node (try using a depth-first search first); Example from Maze.java:
+
+public void dfs() {
+        //DFS uses Stack data structure
+        final Stack<Node> stack = new Stack<>();
+        stack.push(this.rootNode);
+        rootNode.setVisited(true);
+        printNode(rootNode);
+
+        while (!stack.isEmpty()) {
+            final Node node = stack.peek();
+            final Node child = getUnvisitedChildNode(node);
+            if (child == null) {
+                stack.pop();
+            } else {
+                child.setVisited(true);
+                printNode(child);
+                stack.push(child);
+            }
+        }
+
+        //Clear visited property of nodes
+        clearNodes();
+    }
+
+*/
+
   }
 
   /**
