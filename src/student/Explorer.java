@@ -45,6 +45,7 @@ public class Explorer {
       Stack<Long> pathExplored = new Stack<>();
       List<Long> possibleNode = new ArrayList<>();
       List<Long> lastNode = new ArrayList<>();
+      long id = 0;
 
       pathExplored.add(state.getCurrentLocation());
       Collection<NodeStatus> nodeNeighbors = state.getNeighbours();
@@ -52,9 +53,11 @@ public class Explorer {
       System.out.println(pathExplored);
 
 
-      while (state.getDistanceToTarget() != 0){
+      while (state.getDistanceToTarget() != 0) {
           System.out.println(nodeNeighbors);
       }
+      state.moveTo(id); // going to figure out an algorithm to move to the optimal id, closest to orb
+  }
 
 
 /* Notes on how to explore the maze :
@@ -87,7 +90,6 @@ public void dfs() {
 
 */
 
-  }
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
@@ -113,6 +115,7 @@ public void dfs() {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
+      System.out.println(state.getCurrentNode());
     //TODO: Escape from the cavern before time runs out
   }
 }
