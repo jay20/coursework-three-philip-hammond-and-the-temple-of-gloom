@@ -42,20 +42,19 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-      Stack<Long> pathExplored = new Stack<>();
-      List<Long> possibleNode = new ArrayList<>();
-      List<Long> lastNode = new ArrayList<>();
-      long id = 0;
 
-      pathExplored.add(state.getCurrentLocation());
-      Collection<NodeStatus> nodeNeighbors = state.getNeighbours();
-
-      System.out.println(pathExplored);
-
+      // objects that could be useful:
+      Stack<Long> pathExplored = new Stack<>(); //nodes already traversed
+      Collection<NodeStatus> possibleNodes = state.getNeighbours(); //neighbors of current node
+      List<Long> lastNode = new ArrayList<>(); //node most previously traversed
+      List<NodeStatus> lst = new ArrayList<>(); //distance to orb and id
+      long id = 0; //id of node
+      NodeStatus currentNodeStatus; //status of current node
 
       while (state.getDistanceToTarget() != 0) {
-          System.out.println(nodeNeighbors);
-      }
+          pathExplored.push(state.getCurrentLocation()); //adding current node to stack
+          lastNode.add(state.getCurrentLocation()); //adding current node as last
+          }
       state.moveTo(id); // going to figure out an algorithm to move to the optimal id, closest to orb
   }
 
