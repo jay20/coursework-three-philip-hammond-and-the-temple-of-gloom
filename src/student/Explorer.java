@@ -37,7 +37,7 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
 
-/* Notes on how to explore the maze:
+/* Notes on how to explore the maze :
 
 while getDistanceToTarget != 0
 moveTo(long id) of the optimal neighboring node (try using a depth-first search first); Example from Maze.java:
