@@ -57,7 +57,7 @@ public class Explorer {
                   localNeighbors.add(selection); //you can add them to the list of candidates if ID's are different
               }
               else{
-                  break; //if the id does match, try it again????
+                  break; //if the id does match, try it again???? 
               }
           }
           long id; //id of node
