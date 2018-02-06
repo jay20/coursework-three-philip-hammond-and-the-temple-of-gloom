@@ -66,7 +66,7 @@ public class Explorer {
               lastNode.add(id);
           }
           else{
-              pathExplored.pop(); 
+              pathExplored.pop();  
               id = pathExplored.peek();
           }
           state.moveTo(id);
