@@ -2,6 +2,7 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
+import game.Node;
 import game.NodeStatus;
 
 import java.util.ArrayList;
@@ -43,21 +44,34 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
 
-      // objects that could be useful:
       Stack<Long> pathExplored = new Stack<>(); //nodes already traversed
-      Collection<NodeStatus> possibleNodes = state.getNeighbours(); //neighbors of current node
       List<Long> lastNode = new ArrayList<>(); //node most previously traversed
-      List<NodeStatus> lst = new ArrayList<>(); //distance to orb and id
-      long id = 0; //id of node
-      NodeStatus currentNodeStatus; //status of current node
+      List<NodeStatus> lst = new ArrayList<>(); //distance to orb and id list
+      Collection<NodeStatus> getNeighbors = state.getNeighbours(); //neighbors of current node and their statuses
+      long id; //id of node
 
       while (state.getDistanceToTarget() != 0) {
-          pathExplored.push(state.getCurrentLocation()); //adding current node to stack
-          lastNode.add(state.getCurrentLocation()); //adding current node as last
+          pathExplored.push(state.getCurrentLocation());
+          lastNode.add(state.getCurrentLocation());
+          for(NodeStatus selection : getNeighbors){
+              if (!lastNode.contains(selection.getId())){
+                  lst.add(selection); //you can add them to the list of candidates if ID's are different
+              }
           }
-      state.moveTo(id); // going to figure out an algorithm to move to the optimal id, closest to orb
+          NodeStatus ns = null;
+          if (lst.size() > 0){
+              //TODO: have it pick a node close to it
+              id = ns.getId();
+              pathExplored.push(id);
+              lastNode.add(id);
+          }
+          else{
+              pathExplored.pop(); 
+              id = pathExplored.peek();
+          }
+          state.moveTo(id);
+      }
   }
-
 
 /* Notes on how to explore the maze :
 
@@ -114,7 +128,7 @@ public void dfs() {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      System.out.println(state.getCurrentNode());
+      System.out.println("something to fill this");
     //TODO: Escape from the cavern before time runs out
   }
 }
