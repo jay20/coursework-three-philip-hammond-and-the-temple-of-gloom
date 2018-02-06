@@ -47,26 +47,27 @@ public class Explorer {
       Stack<Long> pathExplored = new Stack<>(); //nodes already traversed
       List<Long> lastNode = new ArrayList<>(); //node most previously traversed
       List<NodeStatus> lst = new ArrayList<>(); //distance to orb and id list
-      Collection<NodeStatus> getNeighbors = state.getNeighbours(); //neighbors of current node and their statuses
       long id; //id of node
 
       while (state.getDistanceToTarget() != 0) {
-          pathExplored.push(state.getCurrentLocation());
+          Collection<NodeStatus> getNeighbors = state.getNeighbours(); //neighbors of current node and their statuses
+          pathExplored.add(state.getCurrentLocation());
           lastNode.add(state.getCurrentLocation());
           for(NodeStatus selection : getNeighbors){
               if (!lastNode.contains(selection.getId())){
                   lst.add(selection); //you can add them to the list of candidates if ID's are different
               }
+
           }
           NodeStatus ns = null;
           if (lst.size() > 0){
-              //TODO: have it pick a node close to it
+              lst.stream().sorted(NodeStatus::compareTo).findAny().get();
               id = ns.getId();
               pathExplored.push(id);
               lastNode.add(id);
           }
           else{
-              pathExplored.pop();  
+              pathExplored.pop();
               id = pathExplored.peek();
           }
           state.moveTo(id);
