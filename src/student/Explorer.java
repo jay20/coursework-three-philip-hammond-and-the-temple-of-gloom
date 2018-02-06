@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Explorer {
 
@@ -46,26 +48,19 @@ public class Explorer {
 
       Stack<Long> pathExplored = new Stack<>(); //nodes already traversed
       List<Long> lastNode = new ArrayList<>(); //node most previously traversed
-      pathExplored.add(state.getCurrentLocation());
+      pathExplored.push(state.getCurrentLocation());
       lastNode.add(state.getCurrentLocation());
 
-      while (!(state.getDistanceToTarget() == 0)) {
+      while (state.getDistanceToTarget() != 0) {
+          List<Long> localNeighbors = new <ArrayList>();
           Collection<NodeStatus> getNeighbors = state.getNeighbours(); //neighbors of current node and their statuses
-          Collection<NodeStatus> localNeighbors = new ArrayList<>(); //distance to orb and id list
-          for(NodeStatus selection : getNeighbors){
-              if (!lastNode.contains(selection.getId())){
-                  localNeighbors.add(selection); //you can add them to the list of candidates if ID's are different
-              }
-              else{
-                  break; //if the id does match, try it again???? 
-              }
-          }
+          Stream.of(getNeighbors).filter(selection -> !lastNode.contains(selection.getId).collect(Collectors.toList());
           long id; //id of node
-          NodeStatus ns = null;
-          if (localNeighbors.size() > 0){
-              localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
+          NodeStatus ns;
+          if (localNeighbors.size() >= 0 ){
+              ns = localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
               id = ns.getId();
-              pathExplored.add(id);
+              pathExplored.push(id);
               lastNode.add(id);
           }
           else{
