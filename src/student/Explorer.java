@@ -5,12 +5,7 @@ import game.ExplorationState;
 import game.Node;
 import game.NodeStatus;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Stack;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 public class Explorer {
 
@@ -51,14 +46,18 @@ public class Explorer {
       pathExplored.push(state.getCurrentLocation());
       lastNode.add(state.getCurrentLocation());
 
-      while (state.getDistanceToTarget() != 0) {
-          List<Long> localNeighbors = new <ArrayList>();
+      while (!(state.getDistanceToTarget() ==0)) {
+          List<NodeStatus> localNeighbors = new ArrayList<>();
           Collection<NodeStatus> getNeighbors = state.getNeighbours(); //neighbors of current node and their statuses
-          Stream.of(getNeighbors).filter(selection -> !lastNode.contains(selection.getId).collect(Collectors.toList());
+          for (NodeStatus selection : getNeighbors){
+              if (!lastNode.contains(selection.getId())) {
+                  localNeighbors.add(selection);
+              }
+          }
           long id; //id of node
           NodeStatus ns;
-          if (localNeighbors.size() >= 0 ){
-              ns = localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
+          if (localNeighbors.size() > 0 ){
+              ns = (NodeStatus) localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
               id = ns.getId();
               pathExplored.push(id);
               lastNode.add(id);
@@ -70,37 +69,6 @@ public class Explorer {
           state.moveTo(id);
       }
   }
-
-/* Notes on how to explore the maze :
-
-while getDistanceToTarget != 0
-moveTo(long id) of the optimal neighboring node (try using a depth-first search first); Example from Maze.java:
-
-public void dfs() {
-        //DFS uses Stack data structure
-        final Stack<Node> stack = new Stack<>();
-        stack.push(this.rootNode);
-        rootNode.setVisited(true);
-        printNode(rootNode);
-
-        while (!stack.isEmpty()) {
-            final Node node = stack.peek();
-            final Node child = getUnvisitedChildNode(node);
-            if (child == null) {
-                stack.pop();
-            } else {
-                child.setVisited(true);
-                printNode(child);
-                stack.push(child);
-            }
-        }
-
-        //Clear visited property of nodes
-        clearNodes();
-    }
-
-*/
-
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much
@@ -126,7 +94,21 @@ public void dfs() {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      System.out.println("something to fill this");
     //TODO: Escape from the cavern before time runs out
+
+      //started with making notes on strategies
+
+      Node startNode = state.getCurrentNode(); // the current node
+      long id = 0;
+      Node n = state.getExit();
+      state.pickUpGold();
+
+      Map<Long, Integer> edgeWeights = new HashMap<>();
+      edgeWeights.put(startNode.getId(),0);
+      state.moveTo(n);
+
+
+
+
   }
 }
