@@ -1,9 +1,6 @@
 package student;
 
-import game.EscapeState;
-import game.ExplorationState;
-import game.Node;
-import game.NodeStatus;
+import game.*;
 
 import java.util.*;
 
@@ -96,16 +93,73 @@ public class Explorer {
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
 
+//      * `Node getCurrentNode()`:
+//> return the Node corresponding to the explorers location.
+//
+//* `Node getExit()`:
+//
+//> return the `Node` corresponding to the exit to the cavern (the destination).
+//
+//              * `Collection<Node> getVertices()`:
+//
+//> return a collection of all traversable nodes in the graph.
+//
+//* `int getTimeRemaining()`:
+//
+//> return the number of steps the explorer has left before the ceiling collapses.
+//
+//              * `void moveTo(Node n)`:
+//
+//> move the explorer to node `n`.
+//> This will fail if the given node is not adjacent to the explorers current location.
+//              > Calling this function will decrement the time remaining.
+//
+//* `void pickUpGold()`:
+//
+//> collect all gold on the current tile.
+//              > This will fail if there is no gold on the current tile or it has already been collected.
+
       //started with making notes on strategies
 
       Node startNode = state.getCurrentNode(); // the current node
       long id = 0;
-      Node n = state.getExit();
+      Node n = null;
+      Node target = state.getExit();
       state.pickUpGold();
 
       Map<Long, Integer> edgeWeights = new HashMap<>();
       edgeWeights.put(startNode.getId(),0);
-      state.moveTo(n);
+
+
+      InternalMinHeap<Node> frontier = new InternalMinHeap<>();
+
+      /** Contains an entry for each node in the Settled and Frontier sets. */
+      Map<Long, Integer> pathWeights = new HashMap<>();
+
+      pathWeights.put(startNode.getId(), 0);
+      frontier.add(startNode, 0);
+      /// invariant: as in lecture notes
+      while (!frontier.isEmpty()) {
+          Node f = frontier.poll();
+          if (f.equals(target)) {
+              break;
+          }
+
+          int nWeight = pathWeights.get(f.getId());
+
+          for (Edge e : f.getExits()) {
+              Node w = e.getOther(f);
+              int weightThroughN = nWeight + e.length();
+              Integer existingWeight = pathWeights.get(w.getId());
+              if (existingWeight == null) {
+                  pathWeights.put(w.getId(), weightThroughN);
+                  frontier.add(w, weightThroughN);
+              } else if (weightThroughN < existingWeight) {
+                  pathWeights.put(w.getId(), weightThroughN);
+                  frontier.changePriority(w, weightThroughN);
+              }
+          }
+      }state.moveTo(n);
 
 
 
