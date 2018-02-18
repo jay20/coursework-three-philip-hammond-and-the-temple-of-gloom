@@ -3,10 +3,11 @@ package student;
 import game.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Explorer {
 
-  /**
+    /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
    * Once you find the orb, you must return from the function in order to pick
    * it up. If you continue to move after finding the orb rather
@@ -91,77 +92,66 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-    //TODO: Escape from the cavern before time runs out
+      Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
+      Integer timeRemaining = state.getTimeRemaining();
+      Integer biggestGold = 0;
+      Node currentNode = state.getCurrentNode();
+      Node endNode = state.getExit();
+      Node nextGold = null;
+      ArrayList<Node> findShortestPath = new ArrayList<>();
+      boolean keepGoing = true;
 
-//      * `Node getCurrentNode()`:
-//> return the Node corresponding to the explorers location.
+      while (!(currentNode == endNode)){
+          if (state.getCurrentNode().getTile().getGold() > 0)state.pickUpGold();
+
+      }
+
+
+
+//      Node n = null;
+//      Node target = state.getExit();
 //
-//* `Node getExit()`:
+//      InternalMinHeap<Node> trek = new InternalMinHeap<>();
+//      Map<Long, Integer> pathWeights = new HashMap<>();
+//      Integer timeRemaining = state.getTimeRemaining();
+//      Node startNode = state.getCurrentNode(); // the current node
 //
-//> return the `Node` corresponding to the exit to the cavern (the destination).
+//      Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
 //
-//              * `Collection<Node> getVertices()`:
 //
-//> return a collection of all traversable nodes in the graph.
+//      pathWeights.put(startNode.getId(), 0);
+//      trek.add(startNode, 0);
+//      /// invariant: as in lecture notes
+//      while (!trek.isEmpty()) {
+//          Node f = trek.poll();
+//          if (f.equals(target)) {
+//              break;
+//          }
 //
-//* `int getTimeRemaining()`:
+//          int nWeight = pathWeights.get(f.getId());
 //
-//> return the number of steps the explorer has left before the ceiling collapses.
-//
-//              * `void moveTo(Node n)`:
-//
-//> move the explorer to node `n`.
-//> This will fail if the given node is not adjacent to the explorers current location.
-//              > Calling this function will decrement the time remaining.
-//
-//* `void pickUpGold()`:
-//
-//> collect all gold on the current tile.
-//              > This will fail if there is no gold on the current tile or it has already been collected.
-
-      //started with making notes on strategies
-
-      Node startNode = state.getCurrentNode(); // the current node
-      long id = 0;
-      Node n = null;
-      Node target = state.getExit();
-      state.pickUpGold();
-
-      Map<Long, Integer> edgeWeights = new HashMap<>();
-      edgeWeights.put(startNode.getId(),0);
-
-
-      InternalMinHeap<Node> frontier = new InternalMinHeap<>();
-
-      /** Contains an entry for each node in the Settled and Frontier sets. */
-      Map<Long, Integer> pathWeights = new HashMap<>();
-
-      pathWeights.put(startNode.getId(), 0);
-      frontier.add(startNode, 0);
-      /// invariant: as in lecture notes
-      while (!frontier.isEmpty()) {
-          Node f = frontier.poll();
-          if (f.equals(target)) {
-              break;
-          }
-
-          int nWeight = pathWeights.get(f.getId());
-
-          for (Edge e : f.getExits()) {
-              Node w = e.getOther(f);
-              int weightThroughN = nWeight + e.length();
-              Integer existingWeight = pathWeights.get(w.getId());
-              if (existingWeight == null) {
-                  pathWeights.put(w.getId(), weightThroughN);
-                  frontier.add(w, weightThroughN);
-              } else if (weightThroughN < existingWeight) {
-                  pathWeights.put(w.getId(), weightThroughN);
-                  frontier.changePriority(w, weightThroughN);
-              }
-          }
-      }state.moveTo(n);
-
-
+//          for (Edge e : f.getExits()) {
+//              Node w = e.getOther(f);
+//              int weightThroughN = nWeight + e.length();
+//              Integer existingWeight = pathWeights.get(w.getId());
+//              if (existingWeight == null || weightThroughN <= existingWeight) {
+//                  pathWeights.put(w.getId(), weightThroughN);
+//                  trek.add(w, weightThroughN);
+//              } else if (weightThroughN < existingWeight) {
+//                  pathWeights.put(w.getId(), weightThroughN);
+//                  trek.changePriority(w, weightThroughN);
+//              }
+//              if (state.getCurrentNode().getTile().getGold() > 0)state.pickUpGold();
+//          }
+//      }state.moveTo(n);
+/* current strategy:
+while the start/ current node is not the exit node, get time remaining
+calculate the current path back and get the highest pile of gold available
+if you can reach this and get to the exit in time, go for it
+continue this until there's not enough time left
+continuously pick up gold along the way
+head to the exit when there is just enough time left
+ */
 
 
   }

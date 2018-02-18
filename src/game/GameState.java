@@ -153,18 +153,6 @@ public class GameState implements ExplorationState, EscapeState {
         gui.ifPresent((g) -> g.setLighting(true));
         gui.ifPresent((g) -> g.updateCavern(escapeCavern, timeRemaining));
 
-        try {
-            explorer.escape(this);
-            if (position.equals(escapeCavern.getTarget())) {
-                flags[1] = true;
-            }
-        } catch (OutOfTimeException e) {
-            output(gui, "Your solution to escape ran out of steps before returning!");
-        } catch (Throwable t) {
-            output(gui, "Your code caused an error during the escape phase. Please see console output.");
-            t.printStackTrace();
-            flags[3] = true;
-        }
 
         if (!flags[1]) {
             output(gui, "Your solution to escape failed to end at the stairs. Your code is not correct!");
