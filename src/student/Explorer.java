@@ -91,59 +91,88 @@ public class Explorer {
    *
    * @param state the information available at the current state
    */
-  public void escape(EscapeState state) {
-      Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
+  public Stack<Node> bestPath(EscapeState state, Node startNode, Node endNode) {
+      Node start = state.getCurrentNode();
+      Node end = endNode;
+      Node currentNode = start;
+      InternalMinHeap<Node> trek = new InternalMinHeap<>();
+      Map<Long, Integer> pathWeights = new HashMap<>();
       Integer timeRemaining = state.getTimeRemaining();
-      Integer biggestGold = 0;
-      Node currentNode = state.getCurrentNode();
-      Node endNode = state.getExit();
-      Node nextGold = null;
-      ArrayList<Node> findShortestPath = new ArrayList<>();
-      boolean keepGoing = true;
 
-      while (!(currentNode == endNode)){
-          if (state.getCurrentNode().getTile().getGold() > 0)state.pickUpGold();
+      pathWeights.put(start.getId(), 0);
+      trek.add(start, 0);
+      /// invariant: as in lecture notes
+      Stack<Node> newPath = new Stack<>();
+      Map<Node, Node> previousNode = new HashMap<>();
+      while (!trek.isEmpty()) {
+          currentNode = trek.poll();
+          if (currentNode.equals(end)) {
+              break;
+          }
+          newPath.push(currentNode);
+
+          int nWeight = pathWeights.get(currentNode.getId());
+
+          for (Edge edge : currentNode.getExits()) {
+              Node w = edge.getOther(currentNode);
+              int weightThroughN = nWeight + edge.length();
+              Integer existingWeight = pathWeights.get(w.getId());
+
+              if (existingWeight != null) {
+                  if (weightThroughN < existingWeight) {
+                      pathWeights.put(w.getId(), weightThroughN);
+                      trek.changePriority(w, weightThroughN);
+                  }
+              } else {
+                  pathWeights.put(w.getId(), weightThroughN);
+                  trek.add(w, weightThroughN);
+              }
+
+              if (existingWeight == null || weightThroughN < existingWeight) {
+                  previousNode.put(w, currentNode);
+              }
+              newPath.push(currentNode);
+
+          }
+          return newPath;
 
       }
+      public void getHighestScore(EscapeState state){
+          currentNode = state.getCurrentNode();
+          Stack<Node> bestTrek = new Stack<>();
+          Node nextGoldTile = null;
+          int mostValuable = 0;
+          while (!(currentNode == endNode)) {
+              if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
+              Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
+              for (Node n : highestGold) {
+                  if (n.getTile().getGold() > mostValuable) {
+                      mostValuable = n.getTile().getGold();
+                      nextGoldTile = n;
+                  }
+              }
+              if (nextGoldTile != null) {
+                  bestTrek = bestPath(state, state.getCurrentNode(), nextGoldTile);
+              } else {
+                  bestTrek = bestPath(state, state.getCurrentNode(), state.getExit());
+              }
+              while (!(bestTrek.empty())) {
+                  if (state.getTimeRemaining() > 30) {
+                      state.moveTo(bestTrek.pop());
+                      if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
+                  } else {
+                      bestTrek = bestPath(state, state.getCurrentNode(), state.getExit());
+                  }
+
+              }
+          }
+      }
+  }
+}
+
+//TODO: Everything needs refactoring
 
 
-
-//      Node n = null;
-//      Node target = state.getExit();
-//
-//      InternalMinHeap<Node> trek = new InternalMinHeap<>();
-//      Map<Long, Integer> pathWeights = new HashMap<>();
-//      Integer timeRemaining = state.getTimeRemaining();
-//      Node startNode = state.getCurrentNode(); // the current node
-//
-//      Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
-//
-//
-//      pathWeights.put(startNode.getId(), 0);
-//      trek.add(startNode, 0);
-//      /// invariant: as in lecture notes
-//      while (!trek.isEmpty()) {
-//          Node f = trek.poll();
-//          if (f.equals(target)) {
-//              break;
-//          }
-//
-//          int nWeight = pathWeights.get(f.getId());
-//
-//          for (Edge e : f.getExits()) {
-//              Node w = e.getOther(f);
-//              int weightThroughN = nWeight + e.length();
-//              Integer existingWeight = pathWeights.get(w.getId());
-//              if (existingWeight == null || weightThroughN <= existingWeight) {
-//                  pathWeights.put(w.getId(), weightThroughN);
-//                  trek.add(w, weightThroughN);
-//              } else if (weightThroughN < existingWeight) {
-//                  pathWeights.put(w.getId(), weightThroughN);
-//                  trek.changePriority(w, weightThroughN);
-//              }
-//              if (state.getCurrentNode().getTile().getGold() > 0)state.pickUpGold();
-//          }
-//      }state.moveTo(n);
 /* current strategy:
 while the start/ current node is not the exit node, get time remaining
 calculate the current path back and get the highest pile of gold available
@@ -152,7 +181,3 @@ continue this until there's not enough time left
 continuously pick up gold along the way
 head to the exit when there is just enough time left
  */
-
-
-  }
-}
