@@ -3,7 +3,6 @@ package student;
 import game.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Explorer {
 
@@ -39,6 +38,7 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
 
+
       Stack<Long> pathExplored = new Stack<>(); //nodes already traversed
       List<Long> lastNode = new ArrayList<>(); //node most previously traversed
       pathExplored.push(state.getCurrentLocation());
@@ -55,7 +55,7 @@ public class Explorer {
           long id; //id of node
           NodeStatus ns;
           if (localNeighbors.size() > 0 ){
-              ns = (NodeStatus) localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
+              ns = localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
               id = ns.getId();
               pathExplored.push(id);
               lastNode.add(id);
@@ -91,86 +91,13 @@ public class Explorer {
    *
    * @param state the information available at the current state
    */
-  public Stack<Node> bestPath(EscapeState state, Node startNode, Node endNode) {
-      Node start = state.getCurrentNode();
-      Node end = endNode;
-      Node currentNode = start;
-      InternalMinHeap<Node> trek = new InternalMinHeap<>();
-      Map<Long, Integer> pathWeights = new HashMap<>();
-      Integer timeRemaining = state.getTimeRemaining();
-
-      pathWeights.put(start.getId(), 0);
-      trek.add(start, 0);
-      /// invariant: as in lecture notes
-      Stack<Node> newPath = new Stack<>();
-      Map<Node, Node> previousNode = new HashMap<>();
-      while (!trek.isEmpty()) {
-          currentNode = trek.poll();
-          if (currentNode.equals(end)) {
-              break;
-          }
-          newPath.push(currentNode);
-
-          int nWeight = pathWeights.get(currentNode.getId());
-
-          for (Edge edge : currentNode.getExits()) {
-              Node w = edge.getOther(currentNode);
-              int weightThroughN = nWeight + edge.length();
-              Integer existingWeight = pathWeights.get(w.getId());
-
-              if (existingWeight != null) {
-                  if (weightThroughN < existingWeight) {
-                      pathWeights.put(w.getId(), weightThroughN);
-                      trek.changePriority(w, weightThroughN);
-                  }
-              } else {
-                  pathWeights.put(w.getId(), weightThroughN);
-                  trek.add(w, weightThroughN);
-              }
-
-              if (existingWeight == null || weightThroughN < existingWeight) {
-                  previousNode.put(w, currentNode);
-              }
-              newPath.push(currentNode);
-
-          }
-          return newPath;
-
-      }
-      public void getHighestScore(EscapeState state){
-          currentNode = state.getCurrentNode();
-          Stack<Node> bestTrek = new Stack<>();
-          Node nextGoldTile = null;
-          int mostValuable = 0;
-          while (!(currentNode == endNode)) {
-              if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
-              Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
-              for (Node n : highestGold) {
-                  if (n.getTile().getGold() > mostValuable) {
-                      mostValuable = n.getTile().getGold();
-                      nextGoldTile = n;
-                  }
-              }
-              if (nextGoldTile != null) {
-                  bestTrek = bestPath(state, state.getCurrentNode(), nextGoldTile);
-              } else {
-                  bestTrek = bestPath(state, state.getCurrentNode(), state.getExit());
-              }
-              while (!(bestTrek.empty())) {
-                  if (state.getTimeRemaining() > 30) {
-                      state.moveTo(bestTrek.pop());
-                      if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
-                  } else {
-                      bestTrek = bestPath(state, state.getCurrentNode(), state.getExit());
-                  }
-
-              }
-          }
-      }
+  public void escape(EscapeState state){
+      Trek trek = new Trek();
+      trek.getHighestScore(state);
   }
 }
 
-//TODO: Everything needs refactoring
+
 
 
 /* current strategy:
