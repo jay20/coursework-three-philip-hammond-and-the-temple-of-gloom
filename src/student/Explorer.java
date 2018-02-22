@@ -1,10 +1,12 @@
 package student;
 
-import game.EscapeState;
-import game.ExplorationState;
+import game.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Explorer {
 
+    
     /**
      * Explore the cavern, trying to find the orb in as few steps as possible.
      * Once you find the orb, you must return from the function in order to pick
@@ -36,7 +38,32 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void explore(ExplorationState state) {
-        //TODO:
+        Stack<Long> pathExplored = new Stack<>(); //nodes already traversed
+        List<Long> lastNode = new ArrayList<>(); //node most previously traversed
+        pathExplored.push(state.getCurrentLocation());
+        lastNode.add(state.getCurrentLocation());
+
+        while (!(state.getDistanceToTarget() == 0)) {
+            List<NodeStatus> localNeighbors = new ArrayList<>();
+            Collection<NodeStatus> getNeighbors = state.getNeighbours(); //neighbors of current node and their statuses
+            for (NodeStatus selection : getNeighbors) {
+                if (!lastNode.contains(selection.getId())) {
+                    localNeighbors.add(selection);
+                }
+            }
+            long id; //id of node
+            NodeStatus ns;
+            if (localNeighbors.size() > 0) {
+                ns = localNeighbors.stream().sorted(NodeStatus::compareTo).findAny().get();
+                id = ns.getId();
+                pathExplored.push(id);
+                lastNode.add(id);
+            } else {
+                pathExplored.pop();
+                id = pathExplored.peek();
+            }
+            state.moveTo(id);
+        }
     }
 
     /**
@@ -63,6 +90,61 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void escape(EscapeState state) {
-        //TODO: Escape from the cavern before time runs out
+
+        Integer timeBuffer = Cavern.MAX_EDGE_WEIGHT * 6;
+        Node nextGoldTile = state.getCurrentNode();
+        while (state.getTimeRemaining() > timeBuffer) {
+            int mostValuable = 0;
+            Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
+            for (Node n : highestGold) {
+                if (n.getTile().getGold() > mostValuable) {
+                    mostValuable = n.getTile().getGold();
+                    nextGoldTile = n;
+                }
+            }
+            traversePath(bestPath(state.getCurrentNode(),nextGoldTile),state);
+        }
+        traversePath(bestPath(state.getCurrentNode(),state.getExit()),state);
+    }
+
+    private Stack<Node> bestPath(Node startNode, Node endNode) {
+
+        Node start = startNode;
+        Node end = endNode;
+        InternalMinHeap<Node> trek = new InternalMinHeap<>();
+        Map<Long, Integer> pathWeights = new HashMap<>();
+        Map<Node,Node> pathMap = new HashMap<>();
+        Stack<Node> newPath = new Stack<>();
+        trek.add(startNode,0);
+        pathWeights.put(startNode.getId(),0);
+        while (!trek.isEmpty()) {
+            Node currentNode = trek.poll();
+            if (start.equals(end)) {
+                break;
+            }
+            int currentWeight = pathWeights.get(currentNode.getId());
+            for (Edge edge : currentNode.getExits()) {
+                Node anotherNode = edge.getOther(currentNode);
+                int thisEdgeWeight = currentWeight + edge.length();
+                Integer anotherWeight = pathWeights.get(anotherNode.getId());
+                if(anotherWeight == null){
+                    trek.add(anotherNode,thisEdgeWeight);pathWeights.put(anotherNode.getId(),thisEdgeWeight);pathMap.put(anotherNode,currentNode);
+                }else if(thisEdgeWeight < anotherWeight){
+                    pathMap.put(anotherNode,currentNode);trek.changePriority(anotherNode, thisEdgeWeight);pathWeights.put(anotherNode.getId(),thisEdgeWeight);
+                }
+            }
+        }
+        while(end != start){
+            newPath.push(end);
+            end = pathMap.get(end);
+        }
+        Collections.reverse(newPath);
+        return newPath;
+    }
+
+    private void traversePath(Stack<Node> path, EscapeState state) {
+        for (Node nodesOfPath : path) {
+            if (state.getCurrentNode().getTile().getGold() > 0) { state.pickUpGold();}
+            state.moveTo(nodesOfPath); }
     }
 }
