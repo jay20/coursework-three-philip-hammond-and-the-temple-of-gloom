@@ -89,10 +89,12 @@ public class Explorer {
      *
      * @param state the information available at the current state
      */
+
     public void escape(EscapeState state) {
         pickupGold(state);
         trekToExit(state);
     }
+
     private void pickupGold(EscapeState state) {
         /*
         This function allows Philip to trek around the cavern, picking up as much gold as he can.
@@ -100,8 +102,8 @@ public class Explorer {
         I haven't had any problems with this being the max amount of time Philip has to
         stop collecting gold and head to the exit.
          */
-        int timeBuffer = Cavern.MAX_EDGE_WEIGHT * 20;
         Node nextGoldTile = state.getCurrentNode();
+        int timeBuffer = bestPath(nextGoldTile, state.getExit()).size() + (Cavern.MAX_GOLD_VALUE * 2);
         while (state.getTimeRemaining() > timeBuffer) {
             if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
             int mostValuable = 0;
@@ -158,12 +160,13 @@ public class Explorer {
         When there is no time for Philip to continue collecting gold, he heads to the exit .
         He continues to collect gold on his way back.
          */
+
         traversePath(bestPath(state.getCurrentNode(),state.getExit()),state);
         if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
     }
     private void traversePath(Stack<Node> path, EscapeState state) {
-        /*
-        This function helps Philip trek through the path, step by step, and collect gold along the way.
+        /*this function helps Philip trek through the path, step by step, and collect gold along the way.
+
          */
         for (Node nodesOfPath : path) {
             if (state.getCurrentNode().getTile().getGold() > 0) { state.pickUpGold();}
