@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Explorer {
 
-    
+
     /**
      * Explore the cavern, trying to find the orb in as few steps as possible.
      * Once you find the orb, you must return from the function in order to pick
@@ -90,24 +90,36 @@ public class Explorer {
      * @param state the information available at the current state
      */
     public void escape(EscapeState state) {
-
-        Integer timeBuffer = Cavern.MAX_EDGE_WEIGHT * 6;
+        pickupGold(state);
+        trekToExit(state);
+    }
+    private void pickupGold(EscapeState state) {
+        /*
+        This function allows Philip to trek around the cavern, picking up as much gold as he can.
+        It takes into consideration the amount of time left in the game.
+        I haven't had any problems with this being the max amount of time Philip has to
+        stop collecting gold and head to the exit.
+         */
+        int timeBuffer = Cavern.MAX_EDGE_WEIGHT * 20;
         Node nextGoldTile = state.getCurrentNode();
         while (state.getTimeRemaining() > timeBuffer) {
+            if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
             int mostValuable = 0;
             Collection<Node> highestGold = state.getVertices().stream().sorted(Comparator.comparing(s -> s.getTile().getGold())).collect(Collectors.toList());
             for (Node n : highestGold) {
                 if (n.getTile().getGold() > mostValuable) {
                     mostValuable = n.getTile().getGold();
                     nextGoldTile = n;
-                }
+                    }
+                }traversePath(bestPath(state.getCurrentNode(),nextGoldTile),state);
             }
-            traversePath(bestPath(state.getCurrentNode(),nextGoldTile),state);
         }
-        traversePath(bestPath(state.getCurrentNode(),state.getExit()),state);
-    }
 
     private Stack<Node> bestPath(Node startNode, Node endNode) {
+        /* This function is basically the same as the algorithm in the Cavern class
+        (minPathLengthToTarget) just slightly modified to take into consideration a start point and end point
+        for helping Philip get to where he needs to go at all times.
+         */
 
         Node start = startNode;
         Node end = endNode;
@@ -141,8 +153,18 @@ public class Explorer {
         Collections.reverse(newPath);
         return newPath;
     }
-
+    private void trekToExit(EscapeState state){
+        /*
+        When there is no time for Philip to continue collecting gold, he heads to the exit .
+        He continues to collect gold on his way back.
+         */
+        traversePath(bestPath(state.getCurrentNode(),state.getExit()),state);
+        if (state.getCurrentNode().getTile().getGold() > 0) state.pickUpGold();
+    }
     private void traversePath(Stack<Node> path, EscapeState state) {
+        /*
+        This function helps Philip trek through the path, step by step, and collect gold along the way.
+         */
         for (Node nodesOfPath : path) {
             if (state.getCurrentNode().getTile().getGold() > 0) { state.pickUpGold();}
             state.moveTo(nodesOfPath); }
